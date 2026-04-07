@@ -1,0 +1,300 @@
+import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, Info, Activity, Dumbbell, ClipboardList, Target, AlertCircle } from 'lucide-react';
+
+// --- DATA DE LA RUTINA ---
+const rutinaData = [
+  {
+    id: 'sabado',
+    dayName: 'Sábado',
+    focus: 'Tren Inferior + Tracción Base',
+    exercises: [
+      {
+        id: 's1',
+        name: 'Sentadilla con Barra (Trasera o Frontal)',
+        sets: '3', reps: '8-10', rpe: '7 (RIR 3)', rest: '3 min',
+        tip: 'Mantén el pecho arriba y las rodillas alineadas con la punta de tus pies. Baja hasta que la cadera pase la línea de la rodilla. El control excéntrico (bajada) maximiza la hipertrofia.'
+      },
+      {
+        id: 's2',
+        name: 'Peso Muerto Rumano con Barra',
+        sets: '3', reps: '10-12', rpe: '7 (RIR 3)', rest: '2 min',
+        tip: 'Imagina que quieres empujar una puerta con los glúteos hacia atrás. No bajes más allá de donde tus isquios te permitan sin redondear la espalda baja.'
+      },
+      {
+        id: 's3',
+        name: 'Prensa de Piernas (Pies bajos)',
+        sets: '2', reps: '12-15', rpe: '8 (RIR 2)', rest: '90 seg',
+        tip: 'Colocar los pies bajos en la plataforma enfatiza los cuádriceps. No bloquees las rodillas al final del recorrido para mantener la tensión mecánica.'
+      },
+      {
+        id: 's4',
+        name: 'Dominadas (Recordatorio/Progresión)',
+        sets: '4', reps: 'Máx técnicas', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'Al ser tu punto débil (5 reps max), haremos series controladas de 3-4. Si te fatigas rápido, usa banda elástica. La alta frecuencia te hará mejorar rápido.'
+      }
+    ]
+  },
+  {
+    id: 'domingo',
+    dayName: 'Domingo',
+    focus: 'Tren Superior A (Empuje H / Espalda)',
+    exercises: [
+      {
+        id: 'd1',
+        name: 'Press de Banca Plano con Barra',
+        sets: '3', reps: '6-8', rpe: '8 (RIR 2)', rest: '3 min',
+        tip: 'Aplica retracción escapular (junta los omóplatos contra el banco) para proteger el manguito rotador y empujar con más fuerza. Codos a 45°.'
+      },
+      {
+        id: 'd2',
+        name: 'Remo con Barra (Agarre Supino)',
+        sets: '3', reps: '8-10', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'Tira de la barra hacia tu ombligo (no al pecho). El agarre supino (palmas arriba) involucra más los dorsales bajos y el bíceps.'
+      },
+      {
+        id: 'd3',
+        name: 'Press Inclinado con Mancuernas (30°)',
+        sets: '3', reps: '10-12', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'La ciencia demuestra que 30° es óptimo para la porción clavicular (pecho alto). Esto dará la ilusión óptica de un torso más ancho.'
+      },
+      {
+        id: 'd4',
+        name: 'Extensión de Tríceps en Polea (Cuerda)',
+        sets: '3', reps: '12-15', rpe: '9 (RIR 1)', rest: '90 seg',
+        tip: 'Abre la cuerda al final del movimiento hacia afuera para una contracción completa. Mantén los codos pegados a las costillas.'
+      },
+      {
+        id: 'd5',
+        name: 'Face Pulls (Polea media-alta)',
+        sets: '3', reps: '15-20', rpe: '9 (RIR 1)', rest: '60 seg',
+        tip: 'El mejor ejercicio para hombros 3D y salud postural. Asegúrate de que tus manos terminen detrás de tus codos al tirar (rotación externa).'
+      }
+    ]
+  },
+  {
+    id: 'martes',
+    dayName: 'Martes',
+    focus: 'Tren Inferior + Empuje Base',
+    exercises: [
+      {
+        id: 'm1',
+        name: 'Zancadas (Lunges) con Mancuernas',
+        sets: '3', reps: '10 / pierna', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'Paso largo = más enfoque en glúteo. Paso corto = más cuádriceps. Mantén el torso firme y no dejes que la rodilla colapse hacia adentro.'
+      },
+      {
+        id: 'm2',
+        name: 'Curl Femoral (Sentado o Tumbado)',
+        sets: '3', reps: '12-15', rpe: '8 (RIR 2)', rest: '90 seg',
+        tip: 'Aísla los isquiotibiales. Controla la fase de bajada (excéntrica) durante 2-3 segundos; aquí es donde ocurre el mayor daño muscular.'
+      },
+      {
+        id: 'm3',
+        name: 'Elevación de Talones en Máquina',
+        sets: '4', reps: '12-15', rpe: '10 (Fallo)', rest: '60 seg',
+        tip: 'Haz una pausa de 2 segundos abajo (en máximo estiramiento) para disipar el reflejo elástico del tendón de Aquiles y forzar al músculo a trabajar.'
+      },
+      {
+        id: 'm4',
+        name: 'Flexiones (Recordatorio Pectoral)',
+        sets: '3', reps: 'Máx técnicas', rpe: '9 (RIR 1)', rest: '90 seg',
+        tip: 'Como finisher. Tu máximo es 10; intenta acumular volumen sin llegar al fallo total para no mermar la recuperación de tu pecho.'
+      }
+    ]
+  },
+  {
+    id: 'miercoles',
+    dayName: 'Miércoles',
+    focus: 'Tren Superior B (Tirones V / Hombros)',
+    exercises: [
+      {
+        id: 'w1',
+        name: 'Jalón al Pecho (Agarre Ancho)',
+        sets: '3', reps: '10-12', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'No te inclines en exceso hacia atrás. Saca pecho y lleva la barra a la parte superior del pectoral, imaginando que juntas los codos por detrás.'
+      },
+      {
+        id: 'w2',
+        name: 'Press de Hombros Mancuernas (Sentado)',
+        sets: '3', reps: '8-10', rpe: '8 (RIR 2)', rest: '2 min',
+        tip: 'Banco a 75° (no a 90° recto) para proteger la articulación. No choques las mancuernas arriba, mantén la tensión constante.'
+      },
+      {
+        id: 'w3',
+        name: 'Remo Gironda (Agarre Estrecho)',
+        sets: '3', reps: '10-12', rpe: '8 (RIR 2)', rest: '90 seg',
+        tip: 'Libera ligeramente las escápulas al estirar y apriétalas fuerte al tirar. Imagina aplastar una moneda entre tus omóplatos.'
+      },
+      {
+        id: 'w4',
+        name: 'Elevaciones Laterales',
+        sets: '4', reps: '15-20', rpe: '10 (Fallo)', rest: '60 seg',
+        tip: 'El secreto para ver la cintura más estrecha es tener hombros anchos. "Empuja" el peso hacia las paredes, no hacia el techo.'
+      },
+      {
+        id: 'w5',
+        name: 'Curl de Bíceps Inclinado (Mancuernas)',
+        sets: '3', reps: '10-12', rpe: '9 (RIR 1)', rest: '90 seg',
+        tip: 'Banco a 45°. Deja colgar los brazos. Esto pone la cabeza larga del bíceps en un estiramiento extremo, promoviendo mayor hipertrofia.'
+      }
+    ]
+  }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState(rutinaData[0].id);
+  const [expandedExercise, setExpandedExercise] = useState(null);
+  const [logs, setLogs] = useState({});
+
+  // Manejar cambios en los inputs
+  const handleLogChange = (exerciseId, field, value) => {
+    setLogs(prev => ({
+      ...prev,
+      [exerciseId]: {
+        ...prev[exerciseId],
+        [field]: value
+      }
+    }));
+  };
+
+  const activeDayData = rutinaData.find(d => d.id === activeTab);
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 md:p-8">
+      
+      {/* Header */}
+      <header className="max-w-4xl mx-auto mb-8 text-center">
+        <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-2 uppercase tracking-tight">
+          Iron Coach Pro
+        </h1>
+        <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+          Programa de Recomposición Corporal. 32 años | 72 kg | 1.78m. 
+          Enfoque: Hipertrofia de Torso y Sobrecarga Progresiva.
+        </p>
+      </header>
+
+      {/* Tabs de Días */}
+      <div className="max-w-4xl mx-auto flex overflow-x-auto bg-slate-800 rounded-xl p-2 mb-6 shadow-xl gap-2 snap-x">
+        {rutinaData.map((day) => (
+          <button
+            key={day.id}
+            onClick={() => setActiveTab(day.id)}
+            className={`flex-1 min-w-[100px] snap-center py-3 px-4 rounded-lg font-bold text-sm md:text-base transition-all duration-300 ${
+              activeTab === day.id
+                ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20'
+                : 'text-slate-400 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            {day.dayName}
+          </button>
+        ))}
+      </div>
+
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto">
+        <div className="bg-slate-800 rounded-2xl p-6 shadow-2xl border border-slate-700">
+          
+          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700">
+            <Target className="text-orange-500 w-6 h-6" />
+            <h2 className="text-xl md:text-2xl font-bold text-white">
+              Enfoque: <span className="text-orange-400">{activeDayData.focus}</span>
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {activeDayData.exercises.map((ex, index) => {
+              const isExpanded = expandedExercise === ex.id;
+              const exLogs = logs[ex.id] || { weight: '', setsReps: '', notes: '' };
+
+              return (
+                <div key={ex.id} className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden transition-all duration-300">
+                  
+                  {/* Cabecera del Ejercicio (Clicable) */}
+                  <div 
+                    onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
+                    className="p-4 cursor-pointer hover:bg-slate-800/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+                  >
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="bg-orange-500/20 text-orange-500 rounded-md w-8 h-8 flex items-center justify-center font-bold shrink-0">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-white">{ex.name}</h3>
+                        <div className="flex flex-wrap gap-3 mt-2 text-sm text-slate-400">
+                          <span className="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded"><Activity size={14}/> {ex.sets} x {ex.reps}</span>
+                          <span className="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded text-red-400 font-semibold"><AlertCircle size={14}/> {ex.rpe}</span>
+                          <span className="flex items-center gap-1 bg-slate-800 px-2 py-1 rounded">Rest: {ex.rest}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-slate-500 self-end md:self-center">
+                      {isExpanded ? <ChevronUp /> : <ChevronDown />}
+                    </div>
+                  </div>
+
+                  {/* Panel Expandible (Biomécanica y Registro) */}
+                  {isExpanded && (
+                    <div className="p-4 pt-0 border-t border-slate-800 bg-slate-800/30">
+                      
+                      {/* Tip Científico */}
+                      <div className="flex gap-3 bg-blue-900/20 text-blue-200 p-4 rounded-lg my-4 border border-blue-800/50">
+                        <Info className="shrink-0 text-blue-400 mt-1" size={20} />
+                        <p className="text-sm md:text-base leading-relaxed">
+                          <strong className="text-blue-300">Biomecánica & Coach Tip: </strong>
+                          {ex.tip}
+                        </p>
+                      </div>
+
+                      {/* Inputs de Registro */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div className="space-y-2">
+                          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <Dumbbell size={12}/> Peso Utilizado (Kg)
+                          </label>
+                          <input 
+                            type="text" 
+                            placeholder="Ej. 60kg"
+                            value={exLogs.weight}
+                            onChange={(e) => handleLogChange(ex.id, 'weight', e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <Activity size={12}/> Series x Reps Reales
+                          </label>
+                          <input 
+                            type="text" 
+                            placeholder="Ej. 10, 9, 8"
+                            value={exLogs.setsReps}
+                            onChange={(e) => handleLogChange(ex.id, 'setsReps', e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all"
+                          />
+                        </div>
+                        <div className="md:col-span-2 space-y-2">
+                          <label className="text-xs text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <ClipboardList size={12}/> Observaciones / Dolor
+                          </label>
+                          <textarea 
+                            rows="2"
+                            placeholder="¿Cómo se sintió el peso? ¿Alguna molestia articular?"
+                            value={exLogs.notes}
+                            onChange={(e) => handleLogChange(ex.id, 'notes', e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all resize-none"
+                          ></textarea>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </main>
+
+    </div>
+  );
+}
